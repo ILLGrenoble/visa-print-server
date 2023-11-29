@@ -5,11 +5,11 @@ import { existsSync } from 'fs';
 import { basename } from 'path';
 
 @Injectable()
-export class PrinterService {
+export class FileService {
     private readonly logger: Logger;
 
     constructor() {
-        this.logger = new Logger(PrinterService.name);
+        this.logger = new Logger(FileService.name);
     }
 
     async readFile(path: string): Promise<FileData> {

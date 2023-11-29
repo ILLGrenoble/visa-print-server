@@ -2,7 +2,7 @@ import { Logger, UseGuards } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { WsAuthGuard } from '../guards';
-import { FileData } from '../types';
+import { PrintJob } from '../types';
 
 @WebSocketGateway()
 export class PrinterGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
@@ -32,22 +32,31 @@ export class PrinterGateway implements OnGatewayInit, OnGatewayConnection, OnGat
         return true;
     }
 
-    sendPrinterFile(fileData: FileData): Promise<void> {
-        const printerClientsCount = this.server.sockets.adapter.rooms.get('printer_clients')?.size || 0;
-        if (printerClientsCount == 0) {
+    sendPrinterJob(printJob: PrintJob): Promise<void> {
+        const printerRoom = this.server.sockets.adapter.rooms.get('printer_clients');
+        if (!printerRoom || printerRoom.size == 0) {
+            this.logger.warn(`No clients are connected to receive the print job`);
             throw new Error('No clients connected');
         }
 
         return new Promise<void>((resolve, reject) => {
             this.server
                 .to('printer_clients')
-                .timeout(60000)
-                .emit('print', fileData, (err: any, responses: any[]) => {
+                .timeout(10000)
+                .emit('print', printJob, (err: any, responses: any[]) => {
                     if (err) {
-                        reject(err);
-                    } else {
-                        this.logger.log(`Received ${responses.length} responses`);
+                        this.logger.warn(`Received an error during send of chunk ${printJob.chunkId}/${printJob.chunkCount} of job ${printJob.jobId} data: ${err.message}`);
+                    }
+                    const okCount = responses.filter((response) => response === true).length;
+                    if (okCount > 0) {
+                        if (okCount === responses.length) {
+                            this.logger.debug(`All ${responses.length} clients received correctly chunk ${printJob.chunkId}/${printJob.chunkCount} of job ${printJob.jobId}`);
+                        } else {
+                            this.logger.warn(`Only ${okCount} / ${responses.length} clients received correctly chunk ${printJob.chunkId}/${printJob.chunkCount} of job ${printJob.jobId}`);
+                        }
                         resolve();
+                    } else {
+                        reject(new Error('No client sucessfully received the print job'));
                     }
                 });
         });

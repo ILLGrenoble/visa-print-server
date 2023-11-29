@@ -1,1 +1,1 @@
-export * from './print.dto';
+export * from './print-request.dto';

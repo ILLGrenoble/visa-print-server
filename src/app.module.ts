@@ -1,11 +1,10 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { AppController, PrinterController } from './controllers';
-import { AppService } from './services';
+import { PrinterController } from './controllers';
+import { FileService, PrinterJobService } from './services';
 import { PrinterGateway } from './gateways';
 import { RestAuthGuard, WsAuthGuard } from './guards';
 import appConfig from './config/app.config';
-import { PrinterService } from './services/printer.service';
 
 @Module({
     imports: [
@@ -13,7 +12,7 @@ import { PrinterService } from './services/printer.service';
             load: [appConfig],
         }),
     ],
-    controllers: [AppController, PrinterController],
-    providers: [AppService, PrinterService, PrinterGateway, RestAuthGuard, WsAuthGuard],
+    controllers: [PrinterController],
+    providers: [FileService, PrinterJobService, PrinterGateway, RestAuthGuard, WsAuthGuard],
 })
 export class AppModule {}
