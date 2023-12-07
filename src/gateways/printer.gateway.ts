@@ -17,7 +17,7 @@ export class PrinterGateway implements OnGatewayInit, OnGatewayConnection, OnGat
     }
 
     @UseGuards(WsAuthGuard)
-    @SubscribeMessage('enablePrint')
+    @SubscribeMessage('enable_print')
     handleEnablePrint(client: Socket): boolean {
         client.join('printer_clients');
         this.logger.log(`client ${client.id} is now receiving printer data`);
@@ -25,11 +25,18 @@ export class PrinterGateway implements OnGatewayInit, OnGatewayConnection, OnGat
     }
 
     @UseGuards(WsAuthGuard)
-    @SubscribeMessage('disablePrint')
+    @SubscribeMessage('disable_print')
     handleDisablePrint(client: Socket): boolean {
         client.leave('printer_clients');
         this.logger.log(`client ${client.id} is no longer receiving printer data`);
         return true;
+    }
+
+    @UseGuards(WsAuthGuard)
+    @SubscribeMessage('print_job_handled')
+    handlePrintJobHandled(client: Socket, jobId: number): void {
+        this.logger.log(`client ${client.id} has handled the print job ${jobId}`);
+        client.broadcast.emit('print_job_handled', jobId);
     }
 
     sendPrinterJob(printJob: PrintJob): Promise<void> {
