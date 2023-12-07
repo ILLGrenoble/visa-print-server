@@ -9,5 +9,5 @@ export class PrintRequestDto {
     readonly jobId: number;
 
     @IsNotEmpty()
-    readonly fileName: string;
+    readonly path: string;
 }

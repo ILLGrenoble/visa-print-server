@@ -15,7 +15,7 @@ export class PrinterController {
     @UseGuards(RestAuthGuard)
     async printFile(@Body() request: PrintRequestDto): Promise<string> {
         try {
-            const fileData = await this.fileService.readFile(request.fileName);
+            const fileData = await this.fileService.readFile(request.path);
             if (!fileData) {
                 throw new NotFoundException();
             }
