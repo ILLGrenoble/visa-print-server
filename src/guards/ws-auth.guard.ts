@@ -10,7 +10,9 @@ export class WsAuthGuard implements CanActivate {
         const authToken = this.configService.get<string>('server.authToken');
         if (authToken) {
             const request = context.switchToWs().getClient().handshake;
-            return authToken === request.auth?.token;
+            // Get token from auth (v4 client) or query (v2 client)
+            const clientToken = request.auth?.token || request.query?.token;
+            return authToken === clientToken;
         } else {
             return true;
         }
