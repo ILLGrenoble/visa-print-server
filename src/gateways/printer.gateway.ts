@@ -4,7 +4,7 @@ import { Server, Socket } from 'socket.io';
 import { WsAuthGuard } from '../guards';
 import { PrintJob } from '../types';
 
-@WebSocketGateway()
+@WebSocketGateway({ allowEIO3: true })
 export class PrinterGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer()
     server: Server;
