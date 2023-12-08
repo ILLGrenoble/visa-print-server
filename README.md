@@ -2,11 +2,11 @@
 
 The VISA Print Server is used to transfer PDF documents via websocket to a VISA Print Client which opens a print dialog on the host computer of the VISA user.
 
-The transfer is triggered by a request from the [VISA CUPS Driver](https://ILLGrenoble/visa-cups) when a user prints a document in an instance. It clients are available it will send chunked data to all that have printing enabled.
+The transfer is triggered by a request from the [VISA CUPS Driver](https://github.com/ILLGrenoble/visa-cups) when a user prints a document in an instance. It clients are available it will send chunked data to all that have printing enabled.
 
-The [VISA Print Client](https://ILLGrenoble/visa-print-client), an angular module integrated into the [VISA front end](https://ILLGrenoble/visa-web), receives the PDF data and informs the user/opens a print dialog.
+The [VISA Print Client](https://github.com/ILLGrenoble/visa-print-client), an angular module integrated into the [VISA front end](https://github.com/ILLGrenoble/visa-web), receives the PDF data and informs the user/opens a print dialog.
 
-An [authentication proxy](https://ILLGrenoble/visa-jupyter-proxy) is used to ensure that only the owner of an instance can connect to the VISA Print Server and receive print requests.
+An [authentication proxy](https://github.com/ILLGrenoble/visa-jupyter-proxy) is used to ensure that only the owner of an instance can connect to the VISA Print Server and receive print requests.
 
 The user then selects a local printer to print the document or saves the PDF as a local file.
 
