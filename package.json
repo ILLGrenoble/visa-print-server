@@ -2,7 +2,6 @@
   "name": "visa-print-server",
   "version": "0.9.0",
   "description": "A print server to transfer print jobs from a VISA instance to a print client via websocket",
-  "private": true,
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ILLGrenoble/visa-print-server.git"
