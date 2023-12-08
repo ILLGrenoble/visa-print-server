@@ -1,10 +1,29 @@
 {
   "name": "visa-print-server",
-  "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "version": "0.9.0",
+  "description": "A print server to transfer print jobs from a VISA instance to a print client via websocket",
   "private": true,
-  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ILLGrenoble/visa-print-server.git"
+  },
+  "homepage": "https://github.com/ILLGrenoble/visa-print-server",
+  "license": "GPL-3.0",
+  "author": "Stuart Caunt <caunt@ill.fr>",
+  "files": [
+      "dist",
+      "LICENSE",
+      "README.md",
+      "bin"
+  ],
+  "keywords": [
+      "printing",
+      "print",
+      "nestjs"
+  ],
+  "bin": {
+    "visa-print-server": "bin/visa-print-server"
+  },
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
