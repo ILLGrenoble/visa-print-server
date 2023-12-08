@@ -1,5 +1,5 @@
 {
-  "name": "visa-print-server",
+  "name": "@illgrenoble/visa-print-server",
   "version": "0.9.0",
   "description": "A print server to transfer print jobs from a VISA instance to a print client via websocket",
   "repository": {
