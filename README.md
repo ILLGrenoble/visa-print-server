@@ -1,5 +1,7 @@
 # VISA Print Server
 
+[![npm version](https://badge.fury.io/js/%40illgrenoble%2Fvisa-print-server.svg)](https://badge.fury.io/js/%40illgrenoble%2Fvisa-print-server)
+
 The VISA Print Server is used to transfer PDF documents via websocket to a VISA Print Client which opens a print dialog on the host computer of the VISA user.
 
 The transfer is triggered by a request from the [VISA CUPS Driver](https://github.com/ILLGrenoble/visa-cups) when a user prints a document in an instance. It clients are available it will send chunked data to all that have printing enabled.
