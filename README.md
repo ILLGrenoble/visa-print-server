@@ -40,3 +40,37 @@ The following environment variables can be set to configure the VISA Print Serve
 |VISA_PRINT_SERVER_WEBSOCKET_MAX_DATA|16384|Maximum chunk size that is sent via the websocket|
 
 The environment variables can be stored in a `.env` file.
+
+
+## Demo
+
+A demo is available to quickly test the connection between a client and a server, the transfer of a PDF file via websocket and the opening of the print dialog in the client.
+
+To start the server locally run the following commands in a terminal:
+
+```
+npm i -g @illgrenoble/visa-print-server
+visa-print-server
+```
+
+This will start up the VISA Print Server on localhost:8091 without authentication enabled.
+
+In another terminal, use the following commands to build and run the client:
+
+```
+git clone https://github.com/ILLGrenoble/visa-print-client.git
+cd visa-print-client
+npm install
+npm run build:lib
+npm start
+```
+
+The client will automatically connect to the websocket server on localhost and enable the printing queue. Open a browser window at http://localhost:4200 (you should only see a grey window). In a debug console you should see that the websocket is connected and printing enabled. 
+
+To test the transfer of a PDF file, from another terminal perform the following command:
+
+```
+curl -X POST http://localhost:8091/api/printer --data-urlencode "path=<path_to_a_pdf>" --data-urlencode "jobId=1"
+```
+
+Change `path_to_a_pdf` to the absolute path of a PDF file on your computer. The print dialog should open on the client app with the PDF available for printing.
