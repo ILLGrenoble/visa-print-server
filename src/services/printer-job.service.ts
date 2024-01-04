@@ -15,11 +15,28 @@ export class PrinterJobService {
     }
 
     async processJob(jobId: number, fileData: FileData): Promise<void> {
+        const chunks = this.createPrintJobs(jobId, fileData);
+
+        try {
+            this.logger.log(`Transferring ${chunks.length} chunks for print job ${jobId} (file '${fileData.fileName}' of length ${fileData.length} bytes)`);
+
+            for (const printJob of chunks) {
+                await this.printerGateway.sendPrinterJob(printJob);
+            }
+
+            this.logger.log(`Print job ${jobId} transferred successfully`);
+        } catch (error) {
+            this.logger.error(`Received error during transfer of print job ${jobId}: ${error.message}`);
+            throw error;
+        }
+    }
+
+    private createPrintJobs(jobId: number, fileData: FileData): PrintJob[] {
         // Create chunks
         const maxChunkLength = this.configService.get<WebsocketConfig>('ws').maxData;
         let start = 0;
         let end = 0;
-        const chunks = [];
+        const chunks: PrintJob[] = [];
         const base64 = fileData.data;
         const chunkCount = Math.ceil(base64.length / maxChunkLength);
         while (start < base64.length) {
@@ -47,17 +64,6 @@ export class PrinterJobService {
             throw new Error('Failed to correctly chunk the file data');
         }
 
-        try {
-            this.logger.log(`Transferring ${chunks.length} chunks for print job ${jobId} (file '${fileData.fileName}' of length ${fileData.length} bytes)`);
-
-            for (const printJob of chunks) {
-                await this.printerGateway.sendPrinterJob(printJob);
-            }
-
-            this.logger.log(`Print job ${jobId} transferred successfully`);
-        } catch (error) {
-            this.logger.error(`Received error during transfer of print job ${jobId}: ${error.message}`);
-            throw error;
-        }
+        return chunks;
     }
 }
