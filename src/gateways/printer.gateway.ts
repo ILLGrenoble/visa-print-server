@@ -39,34 +39,39 @@ export class PrinterGateway implements OnGatewayInit, OnGatewayConnection, OnGat
         client.broadcast.emit('print_job_handled', jobId);
     }
 
-    sendPrinterJob(printJob: PrintJob): Promise<void> {
+    async sendChunkedPrinterJob(printJobs: PrintJob[]): Promise<void> {
+        await this.emit('print_job_start');
+
+        for (const printJob of printJobs) {
+            await this.sendPrinterJob(printJob);
+        }
+
+        await this.emit('print_job_end');
+    }
+
+    async sendPrinterJob(printJob: PrintJob): Promise<void> {
         const printerRoom = this.server.sockets.adapter.rooms.get('printer_clients');
         if (!printerRoom || printerRoom.size == 0) {
             this.logger.warn(`No clients are connected to receive the print job`);
             throw new Error('No clients connected');
         }
 
-        return new Promise<void>((resolve, reject) => {
-            this.server
-                .to('printer_clients')
-                .timeout(10000)
-                .emit('print', printJob, (err: any, responses: any[]) => {
-                    if (err) {
-                        this.logger.warn(`Received an error during send of chunk ${printJob.chunkId}/${printJob.chunkCount} of job ${printJob.jobId} data: ${err.message}`);
-                    }
-                    const okCount = responses.filter((response) => response === true).length;
-                    if (okCount > 0) {
-                        if (okCount === responses.length) {
-                            this.logger.debug(`All ${responses.length} clients received correctly chunk ${printJob.chunkId}/${printJob.chunkCount} of job ${printJob.jobId}`);
-                        } else {
-                            this.logger.warn(`Only ${okCount} / ${responses.length} clients received correctly chunk ${printJob.chunkId}/${printJob.chunkCount} of job ${printJob.jobId}`);
-                        }
-                        resolve();
-                    } else {
-                        reject(new Error('No client sucessfully received the print job'));
-                    }
-                });
-        });
+        const { error, responses } = await this.emit('print_job_data', printJob, 10000);
+
+        if (error) {
+            this.logger.warn(`Received an error during send of chunk ${printJob.chunkId}/${printJob.chunkCount} of job ${printJob.jobId} data: ${error.message}`);
+        }
+
+        const okCount = responses.filter((response) => response === true).length;
+        if (okCount > 0) {
+            if (okCount === responses.length) {
+                this.logger.debug(`All ${responses.length} clients received correctly chunk ${printJob.chunkId}/${printJob.chunkCount} of job ${printJob.jobId}`);
+            } else {
+                this.logger.warn(`Only ${okCount} / ${responses.length} clients received correctly chunk ${printJob.chunkId}/${printJob.chunkCount} of job ${printJob.jobId}`);
+            }
+        } else {
+            throw new Error('No client sucessfully received the print job');
+        }
     }
 
     afterInit(/*server: Server*/): void {
@@ -79,5 +84,16 @@ export class PrinterGateway implements OnGatewayInit, OnGatewayConnection, OnGat
 
     handleConnection(client: Socket): void {
         this.logger.log(`Client connected: ${client.id}`);
+    }
+
+    private emit(message: string, data?: any, timeout?: number): Promise<{ error: any; responses: any[] }> {
+        return new Promise((resolve) => {
+            this.server
+                .to('printer_clients')
+                .timeout(timeout)
+                .emit(message, data, (error: any, responses: any[]) => {
+                    resolve({ error, responses });
+                });
+        });
     }
 }

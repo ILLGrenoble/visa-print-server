@@ -20,9 +20,7 @@ export class PrinterJobService {
         try {
             this.logger.log(`Transferring ${chunks.length} chunks for print job ${jobId} (file '${fileData.fileName}' of length ${fileData.length} bytes)`);
 
-            for (const printJob of chunks) {
-                await this.printerGateway.sendPrinterJob(printJob);
-            }
+            await this.printerGateway.sendChunkedPrinterJob(chunks);
 
             this.logger.log(`Print job ${jobId} transferred successfully`);
         } catch (error) {
