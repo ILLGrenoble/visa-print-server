@@ -39,14 +39,14 @@ export class PrinterGateway implements OnGatewayInit, OnGatewayConnection, OnGat
         client.broadcast.emit('print_job_handled', jobId);
     }
 
-    async sendChunkedPrinterJob(printJobs: PrintJob[]): Promise<void> {
-        await this.emit('print_job_start');
+    async sendChunkedPrinterJob(jobId: number, printJobs: PrintJob[]): Promise<void> {
+        await this.emit('print_job_start', jobId);
 
         for (const printJob of printJobs) {
             await this.sendPrinterJob(printJob);
         }
 
-        await this.emit('print_job_end');
+        await this.emit('print_job_end', jobId);
     }
 
     async sendPrinterJob(printJob: PrintJob): Promise<void> {
